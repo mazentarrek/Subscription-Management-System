@@ -40,11 +40,11 @@ public class Subscription {
     private double cost;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 3)
+    @Column(nullable = false)
     private Currency currency;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 4)
+    @Column(nullable = false)
     private BillingCycle billingCycle;
 
     @Column(nullable = false)
@@ -61,7 +61,7 @@ public class Subscription {
     private PaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 4)
+    @Column(nullable = false)
     private SubscriptionStatus status;
 
     private boolean reminderEnabled = true;

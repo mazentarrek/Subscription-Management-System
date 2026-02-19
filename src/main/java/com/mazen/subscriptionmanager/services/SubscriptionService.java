@@ -8,10 +8,10 @@ import com.mazen.subscriptionmanager.entity.Subscription;
 import java.util.List;
 
 public interface SubscriptionService {
-    SubscriptionResponse createSubscription(SubscriptionRequest subscriptionRequest);
+    SubscriptionResponse createSubscription(SubscriptionRequest subscriptionRequest, Long userId);
     SubscriptionResponse updateSubscription(UpdateSubscriptionRequest updateSubscriptionRequest);
     SubscriptionResponse getSubscriptionByid(Long id);
-    List<Subscription> getAllUserSubscriptions(Long userId);
+    List<SubscriptionResponse> getAllUserSubscriptions(Long userId);
     void deleteSubscription(Long id);
-    void cancelSUbscription(Long id);
+    SubscriptionResponse cancelSUbscription(Long id);
 }

@@ -6,11 +6,14 @@ import com.mazen.subscriptionmanager.dto.Response.SubscriptionResponse;
 import com.mazen.subscriptionmanager.entity.Category;
 import com.mazen.subscriptionmanager.entity.PaymentMethod;
 import com.mazen.subscriptionmanager.entity.Subscription;
+import com.mazen.subscriptionmanager.entity.User;
 import com.mazen.subscriptionmanager.enums.BillingCycle;
+import com.mazen.subscriptionmanager.enums.SubscriptionStatus;
 import com.mazen.subscriptionmanager.mappers.SubscriptionMapper;
 import com.mazen.subscriptionmanager.repositories.CategoryRepository;
 import com.mazen.subscriptionmanager.repositories.PaymentMethodRepository;
 import com.mazen.subscriptionmanager.repositories.SubscriptionRepository;
+import com.mazen.subscriptionmanager.repositories.UserRepository;
 import com.mazen.subscriptionmanager.services.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,8 +29,9 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final CategoryRepository categoryRepository;
     private final PaymentMethodRepository paymentMethodRepository;
     private final SubscriptionMapper subscriptionMapper;
+    private final UserRepository userRepository;
 
-    public SubscriptionResponse createSubscription(SubscriptionRequest subscriptionRequest){
+    public SubscriptionResponse createSubscription(SubscriptionRequest subscriptionRequest, Long userId){
         if(subscriptionRepository.existsByName(subscriptionRequest.name())){
             throw new RuntimeException("Subscription already exists");
         }
@@ -38,10 +42,14 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         PaymentMethod paymentMethod = paymentMethodRepository.findById(subscriptionRequest.paymentMethodId())
                 .orElseThrow(() -> new RuntimeException("Payment Method not found"));
 
+        User user = userRepository.findById(userId).
+                orElseThrow(() -> new RuntimeException("Category not found"));
+
         Subscription subscription = subscriptionMapper.toEntity(subscriptionRequest);
 
         subscription.setCategory(category);
         subscription.setPaymentMethod(paymentMethod);
+        subscription.setUser(user);
 
         subscription.setNextBillingDate(calculateNextBilling(subscriptionRequest.startDate(), subscriptionRequest.billingCycle()));
 
@@ -66,23 +74,46 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public SubscriptionResponse getSubscriptionByid(Long id) {
-        return null;
+
+        Subscription subscription = subscriptionRepository.findById(id).
+                orElseThrow(() -> new RuntimeException("Subscription Not Found"));
+
+        return subscriptionMapper.toResponse(subscription);
     }
 
     @Override
-    public List<Subscription> getAllUserSubscriptions(Long userId) {
-        return List.of();
+    public List<SubscriptionResponse> getAllUserSubscriptions(Long userId) {
+
+        User user = userRepository.findById(userId).
+                orElseThrow(() -> new RuntimeException("User Not Found"));
+
+        List<Subscription> subscriptions = subscriptionRepository.findAllByUser(user);
+
+        return subscriptions.stream()
+                .map(subscriptionMapper::toResponse)
+                .toList();
     }
 
     @Override
     public void deleteSubscription(Long id) {
 
+        Subscription subscription = subscriptionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Subscription not Found"));
+
+        subscriptionRepository.delete(subscription);
+
     }
 
     @Override
-    public void cancelSUbscription(Long id) {
+    public SubscriptionResponse cancelSUbscription(Long id) {
 
+        Subscription subscription = subscriptionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Subscription not Found"));
+
+        subscription.setStatus(SubscriptionStatus.CANCELLED);
+
+        Subscription savedSubscription = subscriptionRepository.save(subscription);
+
+        return subscriptionMapper.toResponse(savedSubscription);
     }
-
-
 }
