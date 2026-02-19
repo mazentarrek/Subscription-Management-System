@@ -22,15 +22,15 @@ public class JWTTokenProvider {
     private Long expirationTime;
 
     // A SigningKey is created from your secret string
-    private Key getSigningKey() {
+    public Key getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
     //Creates the string to send to the client.
-    private String generateToken(String username){
+    public String generateToken(String email){
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(email)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -60,7 +60,7 @@ public class JWTTokenProvider {
         return (extractedUsername.equals(username) && !isTokenExpired(token));
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 

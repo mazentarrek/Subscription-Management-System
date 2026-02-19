@@ -54,7 +54,7 @@ public class Subscription {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
-    private Category categoryId;
+    private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_method_id")

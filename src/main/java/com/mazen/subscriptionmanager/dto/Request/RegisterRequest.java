@@ -10,6 +10,5 @@ public record RegisterRequest (
         @NotBlank @Size(min = 8) String password,
         @NotBlank String firstName,
         @NotBlank String lastName
-
 )
 { }
