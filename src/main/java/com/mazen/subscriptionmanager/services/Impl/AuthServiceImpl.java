@@ -2,6 +2,7 @@ package com.mazen.subscriptionmanager.services.Impl;
 
 import com.mazen.subscriptionmanager.dto.Request.LoginRequest;
 import com.mazen.subscriptionmanager.dto.Request.RegisterRequest;
+import com.mazen.subscriptionmanager.dto.Request.ResetPasswordRequest;
 import com.mazen.subscriptionmanager.dto.Response.AuthResponse;
 import com.mazen.subscriptionmanager.entity.User;
 import com.mazen.subscriptionmanager.mappers.UserMapper;
@@ -63,5 +64,23 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtService.generateToken(loginRequest.email());
 
         return userMapper.toResponse(user, token);
+    }
+
+    @Override
+    public AuthResponse reset_password(ResetPasswordRequest resetPasswordRequest) {
+        User user = userRepository.findByEmail(resetPasswordRequest.email());
+
+        if (!passwordEncoder.matches(resetPasswordRequest.old_password(), user.getPassword())){
+            throw new RuntimeException("Incorrect password");
+        }
+
+        user.setPassword(passwordEncoder.encode(resetPasswordRequest.new_password()));
+
+        User savedUser = userRepository.save(user);
+
+        //Generate the JWT
+        String token = jwtService.generateToken(resetPasswordRequest.email());
+
+        return userMapper.toResponse(savedUser, token);
     }
 }
