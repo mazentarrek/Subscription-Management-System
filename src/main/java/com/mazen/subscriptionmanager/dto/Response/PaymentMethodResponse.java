@@ -5,7 +5,7 @@ import com.mazen.subscriptionmanager.enums.PaymentType;
 public record PaymentMethodResponse(
         Long id,
         PaymentType type,
-        String lastFourDigits, // "************4444"
+        String lastFourDigits,
         String cardHolderName,
         boolean isDefault
 ) {
