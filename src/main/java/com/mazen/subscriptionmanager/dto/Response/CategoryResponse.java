@@ -4,6 +4,7 @@ public record CategoryResponse(
         Long id,
         String name,
         String icon,
-        String color
+        String color,
+        String message
 ) {
 }

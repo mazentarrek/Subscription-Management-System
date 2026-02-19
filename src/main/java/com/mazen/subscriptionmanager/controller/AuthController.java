@@ -27,7 +27,7 @@ public class AuthController {
     public AuthResponse login(@RequestBody LoginRequest loginRequest){
         return authService.login(loginRequest);
     }
-    
+
     @PostMapping("/reset-password")
     public AuthResponse reset_password(@RequestBody ResetPasswordRequest resetPasswordRequest){
         return authService.reset_password(resetPasswordRequest);
